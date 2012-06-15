@@ -1,0 +1,26 @@
+digraph example {
+  graph [fontname=Helvetica, fontsize=10];
+  edge  [fontname=Helvetica, fontsize=10];
+  node  [fontname=Helvetica, fontsize=14];
+  node [shape=record];
+  
+  app1 [ label="Biometric Application"];
+  app2 [ label="Biometric Application"];
+  framework [ label="BioAPI Framework"];
+  bsp1 [ label="BSP"];
+  bsp2 [ label="BSP"];
+  bsp3 [ label="BSP"];
+  bsp1_dev [ label="Device"];
+  bsp2_dev [ label="Device"];
+  bsp3_dev1 [ label="Device 1"];
+  bsp3_devN [ label="Device N"];
+  app1 -> framework [ label="API"];
+  app2 -> framework [ label="API"];
+  framework -> bsp1 [ label="SPI"];
+  framework -> bsp2 [ label="SPI"];
+  framework -> bsp3 [ label="SPI"];
+  bsp1 -> bsp1_dev;
+  bsp2 -> bsp2_dev;
+  bsp3 -> bsp3_dev1;
+  bsp3 -> bsp3_devN;
+}
