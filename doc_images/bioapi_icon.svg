@@ -189,6 +189,15 @@
          stdDeviation="2.2394806"
          id="feGaussianBlur4669" />
     </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter5123-4"
+       color-interpolation-filters="sRGB">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="8.0580508"
+         id="feGaussianBlur5125-3" />
+    </filter>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -198,10 +207,10 @@
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
      inkscape:zoom="2"
-     inkscape:cx="47.47103"
+     inkscape:cx="-12.02897"
      inkscape:cy="132.40278"
      inkscape:document-units="px"
-     inkscape:current-layer="g5127"
+     inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1272"
      inkscape:window-height="706"
@@ -216,7 +225,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -227,7 +236,7 @@
      transform="translate(-102.52808,-141.96176)">
     <g
        id="g5185"
-       transform="matrix(0.25050243,0,0,0.25,76.844547,153.46846)">
+       transform="matrix(0.25050243,0,0,0.25,76.844545,153.46846)">
       <path
          inkscape:connector-curvature="0"
          sodipodi:nodetypes="csscsccccccccccccccsscc"
@@ -265,11 +274,11 @@
     </g>
     <g
        id="g5127"
-       transform="matrix(2.9120725,0,0,2.9120725,-519.08251,-512.82406)" />
+       transform="matrix(2.9120725,0,0,2.9120725,-519.08251,-514.09172)" />
     <g
        id="g3847"
        style="fill:#ffffff;fill-opacity:1;stroke:none"
-       transform="matrix(0.44917855,0,0,0.44917855,57.147477,99.276071)">
+       transform="matrix(0.44917855,0,0,0.44917855,57.147475,99.27607)">
       <g
          transform="translate(-0.244849,0.209448)"
          id="g3841-1"
@@ -355,7 +364,7 @@
     </g>
     <g
        id="g5050"
-       transform="matrix(0.9734759,0,0,0.9705664,-171.70191,81.600539)">
+       transform="matrix(0.9734759,0,0,0.9705664,-172.20192,81.600538)">
       <text
          transform="matrix(1.095981,0,0,0.91242457,38.26087,-43.043478)"
          sodipodi:linespacing="125%"
