@@ -16,19 +16,19 @@
  * -# Component Registry Interface
  * -# \ref bioapi_errors.h "Error Codes and Error Values"
  */
-#ifdef VR_BIOAPI_H
+#ifndef VR_BIOAPI_H
 #define VR_BIOAPI_H
 
-#include "vrbioapi_scope.h"              ///Section  1: "Scope"
-#include "vrbioapi_conformance.h"        ///Section  2: "Conformance"
-#include "vrbioapi_references.h"         ///Section  3: "Normative references"
-#include "vrbioapi_definitions.h"        ///Section  4: "Terms and definitions"
-#include "vrbioapi_symbols.h"            ///Section  5: "Symbols and abbreviated terms"
-#include "vrbioapi_architecture.h"       ///Section  6: "The BioAPI architecture"
-#include "vrbioapi_types.h"              ///Section  7: "BioAPI Types and Macros"
-#include "vrbioapi_functions.h"          ///Section  8: "BioAPI Functions"
-#include "vrbioapi_spi.h"                ///Section  9: "BioAPI Service Provider Interface"
-#include "vrbioapi_componentregistry.h"  ///Section 10: "Component registry interface"
-#include "vrbioapi_errors.h"             ///Section 11: "BioAPI error handling"
+#include "bioapi_scope.h"              ///Section  1: "Scope"
+#include "bioapi_conformance.h"        ///Section  2: "Conformance"
+#include "bioapi_references.h"         ///Section  3: "Normative references"
+#include "bioapi_definitions.h"        ///Section  4: "Terms and definitions"
+#include "bioapi_symbols.h"            ///Section  5: "Symbols and abbreviated terms"
+#include "bioapi_architecture.h"       ///Section  6: "The BioAPI architecture"
+#include "bioapi_types.h"              ///Section  7: "BioAPI Types and Macros"
+#include "bioapi_functions.h"          ///Section  8: "BioAPI Functions"
+#include "bioapi_spi.h"                ///Section  9: "BioAPI Service Provider Interface"
+#include "bioapi_componentregistry.h"  ///Section 10: "Component registry interface"
+#include "bioapi_errors.h"             ///Section 11: "BioAPI error handling"
 
 #endif //VR_BIOAPI_H

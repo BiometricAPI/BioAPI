@@ -4,10 +4,10 @@
  * 
  * \section NO_VALUE_AVAILABLE  Foo
  */
-#ifdef VR_BIOAPI_FUNCTIONS_H
+#ifndef VR_BIOAPI_FUNCTIONS_H
 #define VR_BIOAPI_FUNCTIONS_H
 
-#include "vrbioapi_types.h"
+#include "bioapi_types.h"
 
 
 
