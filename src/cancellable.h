@@ -1,18 +1,6 @@
 #pragma once
 
-#include <string>
-#include <map>
-#include <pthread.h>
-#include "util.h"
- 
-#define UNIT_DO_CANCELLABLE(unit, task_name, function) \
-{ \
-    if (!(unit)->UseStart(task_name) ) \
-        return BIOAPI_UNIT_ERROR | BioAPIERR_USER_CANCELLED; \
-    BioAPI_RETURN ret = (unit)->function; \
-    (unit)->UseEnd(task_name); \
-    return ret;\
-}
+#include "common.h"
 
 class Cancellable {
 protected:
@@ -54,6 +42,4 @@ public:
     bool UseStart(std::string taskName);
     ///Releases an object after it has been used.
     void UseEnd(std::string taskName);
-    
-    static uint64_t Timestamp();
 };

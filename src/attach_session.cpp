@@ -1,17 +1,45 @@
-#include "attach_session.h"
+#include "common.h"
+
+ 
+#define UNIT_DO_CANCELLABLE(unit, task_name, function) \
+{ \
+    if (!(unit)->UseStart(task_name) ) \
+        return BIOAPI_UNIT_ERROR | BioAPIERR_USER_CANCELLED; \
+    BioAPI_RETURN ret = (unit)->function; \
+    (unit)->UseEnd(task_name); \
+    return ret;\
+}
+
+
+
+
+
+static void FreeBIR (
+    BioAPI_BIR *Ptr)
+{
+    if (Ptr != NULL) {
+        BioSPI_Free (Ptr->BiometricData.Data);
+        BioSPI_Free (Ptr->SecurityBlock.Data);
+        BioSPI_Free (Ptr);
+    }
+}
+
+
+
+
 
 AttachSession::AttachSession (
     UnitArchive *unitArchive, 
     UnitMatching *unitMatching, 
     UnitProcessing *unitProcessing, 
     UnitSensor *unitSensor)
-:  bir_handles(free)
-{
-    this->unitArchive = unitArchive;
-    this->unitMatching = unitMatching;
-    this->unitProcessing = unitProcessing;
-    this->unitSensor = unitSensor;
-}
+:   
+    bir_handles(FreeBIR),
+    unitArchive (unitArchive),
+    unitMatching (unitMatching),
+    unitProcessing (unitProcessing),
+    unitSensor (unitSensor)
+{ }
 
 
 AttachSession::~AttachSession ()
@@ -58,7 +86,7 @@ void AttachSession::CancelTasksJoin()
 BioAPI_RETURN AttachSession::FreeBIRHandle (
     BioAPI_BIR_HANDLE Handle)
 {
-    if (!bir_handles.remove(Handle, "FreeBIRHandle"))
+    if (!bir_handles.Remove(Handle, __func__))
         return BioAPIERR_INVALID_BIR_HANDLE;
     return BioAPI_OK;
 }
@@ -68,13 +96,13 @@ BioAPI_RETURN AttachSession::GetBIRFromHandle (
     BioAPI_BIR_HANDLE Handle,
     BioAPI_BIR *BIR)
 {
-    BioAPI_BIR* data = bir_handles.get(Handle, "GetBIRFromHandle");
+    BioAPI_BIR* data = bir_handles.Get(Handle, __func__);
     if (data == NULL)
         return BioAPIERR_INVALID_BIR_HANDLE;
     
-    clone(*BIR, *data);
+    BioUtil_CloneBIR(*BIR, *data);
     
-    bir_handles.release(Handle, "GetBIRFromHandle", true); //Releases and removes the handle
+    bir_handles.Release(Handle, __func__, true); //Releases and removes the handle
     
     return BioAPI_OK;
 }
@@ -84,13 +112,13 @@ BioAPI_RETURN AttachSession::GetHeaderFromHandle (
     BioAPI_BIR_HANDLE Handle,
     BioAPI_BIR_HEADER *Header)
 {
-    BioAPI_BIR* data = bir_handles.get(Handle, "GetHeaderFromHandle");
+    BioAPI_BIR* data = bir_handles.Get(Handle, __func__);
     if (data == NULL)
         return BioAPIERR_INVALID_BIR_HANDLE;
     
     *Header = data->Header;
     
-    bir_handles.release(Handle, "GetHeaderFromHandle"); //Releases
+    bir_handles.Release(Handle, __func__); //Releases
     
     return BioAPI_OK;
 }
@@ -123,11 +151,11 @@ BioAPI_RETURN AttachSession::ControlUnit (
 {
   Unit* unit = GetUnit(UnitID);
   if (unit==NULL)
-      return BIOAPI_BSP_ERROR | BioAPIERR_INVALID_UNIT_ID;
+      return BIOAPI_BSP_ERROR | BioAPIERR_FUNCTION_NOT_SUPPORTED;
   
   UNIT_DO_CANCELLABLE(
       unit, 
-      "Unit::ControlUnit", 
+      __func__, 
       ControlUnit (
           this,
           ControlCode,
@@ -142,11 +170,11 @@ BioAPI_RETURN AttachSession::SetPowerMode (
 {
     Unit* unit = GetUnit(UnitID);
     if (unit==NULL)
-        return BIOAPI_BSP_ERROR | BioAPIERR_INVALID_UNIT_ID;
+        return BIOAPI_BSP_ERROR | BioAPIERR_FUNCTION_NOT_SUPPORTED;
     
     UNIT_DO_CANCELLABLE(
         unit, 
-        "Unit::SetPowerMode", 
+        __func__, 
         SetPowerMode (
             this,
             PowerMode ) );
@@ -158,11 +186,11 @@ BioAPI_RETURN AttachSession::SetIndicatorStatus (
 {
     Unit* unit = GetUnit(UnitID);
     if (unit==NULL)
-        return BIOAPI_BSP_ERROR | BioAPIERR_INVALID_UNIT_ID;
+        return BIOAPI_BSP_ERROR | BioAPIERR_FUNCTION_NOT_SUPPORTED;
     
     UNIT_DO_CANCELLABLE(
         unit, 
-        "Unit::SetIndicatorStatus", 
+        __func__, 
         SetIndicatorStatus ( 
             this,
             IndicatorStatus ) );
@@ -175,11 +203,11 @@ BioAPI_RETURN AttachSession::GetIndicatorStatus (
 {
     Unit* unit = GetUnit(UnitID);
     if (unit==NULL)
-        return BIOAPI_BSP_ERROR | BioAPIERR_INVALID_UNIT_ID;
+        return BIOAPI_BSP_ERROR | BioAPIERR_FUNCTION_NOT_SUPPORTED;
     
     UNIT_DO_CANCELLABLE(
         unit, 
-        "Unit::GetIndicatorStatus", 
+        __func__, 
         GetIndicatorStatus ( 
             this,
             IndicatorStatus ) );  
@@ -202,11 +230,11 @@ BioAPI_RETURN AttachSession::DbOpen (
     BioAPI_DB_MARKER_HANDLE *MarkerHandle) 
 {
     if (unitArchive==NULL)
-        return BIOAPI_BSP_ERROR | BioAPIERR_INVALID_UNIT_ID;
+        return BIOAPI_BSP_ERROR | BioAPIERR_FUNCTION_NOT_SUPPORTED;
     
     UNIT_DO_CANCELLABLE(
         unitArchive, 
-        "Archive::DbOpen", 
+        __func__, 
         DbOpen ( 
             this,
             DbUuid,
@@ -220,11 +248,11 @@ BioAPI_RETURN AttachSession::DbClose (
     BioAPI_DB_HANDLE DbHandle)
 {
     if (unitArchive==NULL)
-        return BIOAPI_BSP_ERROR | BioAPIERR_INVALID_UNIT_ID;
+        return BIOAPI_BSP_ERROR | BioAPIERR_FUNCTION_NOT_SUPPORTED;
     
     UNIT_DO_CANCELLABLE(
         unitArchive, 
-        "Archive::DbClose", 
+        __func__, 
         DbClose ( 
             this,
             DbHandle ) );  
@@ -237,11 +265,11 @@ BioAPI_RETURN AttachSession::DbCreate (
     BioAPI_DB_HANDLE *DbHandle)
 {
     if (unitArchive==NULL)
-        return BIOAPI_BSP_ERROR | BioAPIERR_INVALID_UNIT_ID;
+        return BIOAPI_BSP_ERROR | BioAPIERR_FUNCTION_NOT_SUPPORTED;
     
     UNIT_DO_CANCELLABLE(
         unitArchive, 
-        "Archive::DbCreate", 
+        __func__, 
         DbCreate ( 
             this,
             DbUuid,
@@ -255,11 +283,11 @@ BioAPI_RETURN AttachSession::DbDelete (
     const BioAPI_UUID *DbUuid)
 {
     if (unitArchive==NULL)
-        return BIOAPI_BSP_ERROR | BioAPIERR_INVALID_UNIT_ID;
+        return BIOAPI_BSP_ERROR | BioAPIERR_FUNCTION_NOT_SUPPORTED;
     
     UNIT_DO_CANCELLABLE(
         unitArchive, 
-        "Archive::DbDelete", 
+        __func__, 
         DbDelete ( 
             this,
             DbUuid ) );  
@@ -272,11 +300,11 @@ BioAPI_RETURN AttachSession::DbSetMarker (
     BioAPI_DB_MARKER_HANDLE MarkerHandle)
 {
     if (unitArchive==NULL)
-        return BIOAPI_BSP_ERROR | BioAPIERR_INVALID_UNIT_ID;
+        return BIOAPI_BSP_ERROR | BioAPIERR_FUNCTION_NOT_SUPPORTED;
     
     UNIT_DO_CANCELLABLE(
         unitArchive, 
-        "Archive::DbSetMarker", 
+        __func__, 
         DbSetMarker ( 
             this,
             DbHandle,
@@ -289,11 +317,11 @@ BioAPI_RETURN AttachSession::DbFreeMarker (
     BioAPI_DB_MARKER_HANDLE MarkerHandle)
 {
     if (unitArchive==NULL)
-        return BIOAPI_BSP_ERROR | BioAPIERR_INVALID_UNIT_ID;
+        return BIOAPI_BSP_ERROR | BioAPIERR_FUNCTION_NOT_SUPPORTED;
     
     UNIT_DO_CANCELLABLE(
         unitArchive, 
-        "Archive::DbFreeMarker", 
+        __func__, 
         DbFreeMarker ( 
             this,
             MarkerHandle ) );  
@@ -306,11 +334,11 @@ BioAPI_RETURN AttachSession::DbStoreBIR (
     BioAPI_UUID *BirUuid)
 {
     if (unitArchive==NULL)
-        return BIOAPI_BSP_ERROR | BioAPIERR_INVALID_UNIT_ID;
+        return BIOAPI_BSP_ERROR | BioAPIERR_FUNCTION_NOT_SUPPORTED;
     
     UNIT_DO_CANCELLABLE(
         unitArchive, 
-        "Archive::DbStoreBIR", 
+        __func__, 
         DbStoreBIR ( 
             this,
             BIRToStore,
@@ -326,11 +354,11 @@ BioAPI_RETURN AttachSession::DbGetBIR (
     BioAPI_DB_MARKER_HANDLE *MarkerHandle)
 {
     if (unitArchive==NULL)
-        return BIOAPI_BSP_ERROR | BioAPIERR_INVALID_UNIT_ID;
+        return BIOAPI_BSP_ERROR | BioAPIERR_FUNCTION_NOT_SUPPORTED;
     
     UNIT_DO_CANCELLABLE(
         unitArchive, 
-        "Archive::DbGetBIR", 
+        __func__, 
         DbGetBIR ( 
             this,
             DbHandle,
@@ -347,11 +375,11 @@ BioAPI_RETURN AttachSession::DbGetNextBIR (
     BioAPI_UUID *BirUuid)
 {
     if (unitArchive==NULL)
-        return BIOAPI_BSP_ERROR | BioAPIERR_INVALID_UNIT_ID;
+        return BIOAPI_BSP_ERROR | BioAPIERR_FUNCTION_NOT_SUPPORTED;
     
     UNIT_DO_CANCELLABLE(
         unitArchive, 
-        "Archive::DbGetNextBIR", 
+        __func__, 
         DbGetNextBIR ( 
             this,
             DbHandle,
@@ -365,11 +393,11 @@ BioAPI_RETURN AttachSession::DbDeleteBIR (
     const BioAPI_UUID *KeyValue)
 {
     if (unitArchive==NULL)
-        return BIOAPI_BSP_ERROR | BioAPIERR_INVALID_UNIT_ID;
+        return BIOAPI_BSP_ERROR | BioAPIERR_FUNCTION_NOT_SUPPORTED;
     
     UNIT_DO_CANCELLABLE(
         unitArchive, 
-        "Archive::DbDeleteBIR", 
+        __func__, 
         DbDeleteBIR ( 
             this,
             DbHandle,
@@ -396,11 +424,11 @@ BioAPI_RETURN AttachSession::VerifyMatch (
     BioAPI_DATA *Payload)
 {
     if (unitMatching==NULL)
-        return BIOAPI_BSP_ERROR | BioAPIERR_INVALID_UNIT_ID;
+        return BIOAPI_BSP_ERROR | BioAPIERR_FUNCTION_NOT_SUPPORTED;
     
     UNIT_DO_CANCELLABLE(
         unitMatching, 
-        "Matching::VerifyMatch", 
+        __func__, 
         VerifyMatch ( 
             this,
             MaxFMRRequested,
@@ -425,11 +453,11 @@ BioAPI_RETURN AttachSession::IdentifyMatch (
     int32_t Timeout)
 {
     if (unitMatching==NULL)
-        return BIOAPI_BSP_ERROR | BioAPIERR_INVALID_UNIT_ID;
+        return BIOAPI_BSP_ERROR | BioAPIERR_FUNCTION_NOT_SUPPORTED;
     
     UNIT_DO_CANCELLABLE(
         unitMatching, 
-        "Matching::IdentifyMatch", 
+        __func__, 
         IdentifyMatch ( 
             this,
             MaxFMRRequested,
@@ -448,11 +476,11 @@ BioAPI_RETURN AttachSession::PresetIdentifyPopulation (
     const BioAPI_IDENTIFY_POPULATION *Population)
 {
     if (unitMatching==NULL)
-        return BIOAPI_BSP_ERROR | BioAPIERR_INVALID_UNIT_ID;
+        return BIOAPI_BSP_ERROR | BioAPIERR_FUNCTION_NOT_SUPPORTED;
     
     UNIT_DO_CANCELLABLE(
         unitMatching, 
-        "Matching::PresetIdentifyPopulation", 
+        __func__, 
         PresetIdentifyPopulation ( 
             this,
             Population ) );  
@@ -477,11 +505,11 @@ BioAPI_RETURN AttachSession::CreateTemplate (
     BioAPI_UUID *TemplateUUID)
 {
     if (unitProcessing==NULL)
-        return BIOAPI_BSP_ERROR | BioAPIERR_INVALID_UNIT_ID;
+        return BIOAPI_BSP_ERROR | BioAPIERR_FUNCTION_NOT_SUPPORTED;
     
     UNIT_DO_CANCELLABLE(
         unitProcessing, 
-        "Processing::CreateTemplate", 
+        __func__, 
         CreateTemplate ( 
             this,
             CapturedBIR,
@@ -499,11 +527,11 @@ BioAPI_RETURN AttachSession::Process (
     BioAPI_BIR_HANDLE *ProcessedBIR)
 {
     if (unitProcessing==NULL)
-        return BIOAPI_BSP_ERROR | BioAPIERR_INVALID_UNIT_ID;
+        return BIOAPI_BSP_ERROR | BioAPIERR_FUNCTION_NOT_SUPPORTED;
     
     UNIT_DO_CANCELLABLE(
         unitProcessing, 
-        "Processing::Process", 
+        __func__, 
         Process (
             this,
             CapturedBIR,
@@ -519,11 +547,11 @@ BioAPI_RETURN AttachSession::ProcessWithAuxBIR (
     BioAPI_BIR_HANDLE *ProcessedBIR)
 {
     if (unitProcessing==NULL)
-        return BIOAPI_BSP_ERROR | BioAPIERR_INVALID_UNIT_ID;
+        return BIOAPI_BSP_ERROR | BioAPIERR_FUNCTION_NOT_SUPPORTED;
     
     UNIT_DO_CANCELLABLE(
         unitProcessing, 
-        "Processing::ProcessWithAuxBIR",
+        __func__, 
         ProcessWithAuxBIR ( 
             this,
             CapturedBIR,
@@ -551,11 +579,11 @@ BioAPI_RETURN AttachSession::Capture (
     BioAPI_BIR_HANDLE *AuditData)
 {
     if (unitSensor==NULL)
-        return BIOAPI_BSP_ERROR | BioAPIERR_INVALID_UNIT_ID;
+        return BIOAPI_BSP_ERROR | BioAPIERR_FUNCTION_NOT_SUPPORTED;
     
     UNIT_DO_CANCELLABLE(
         unitSensor, 
-        "Sensor::Capture",
+        __func__, 
         Capture (
             this,
             Purpose,
@@ -571,11 +599,11 @@ BioAPI_RETURN AttachSession::CalibrateSensor (
     int32_t Timeout)
 {
     if (unitSensor==NULL)
-        return BIOAPI_BSP_ERROR | BioAPIERR_INVALID_UNIT_ID;
+        return BIOAPI_BSP_ERROR | BioAPIERR_FUNCTION_NOT_SUPPORTED;
     
     UNIT_DO_CANCELLABLE(
         unitSensor, 
-        "Sensor::CalibrateSensor",
+        __func__, 
         CalibrateSensor ( 
             this,
             Timeout ) );
@@ -620,10 +648,10 @@ BioAPI_RETURN AttachSession::Verify (
     BioAPI_BIR_HANDLE *AuditData)
 {
     if (unitSensor==NULL || unitMatching==NULL || unitProcessing==NULL)
-        return BIOAPI_BSP_ERROR | BioAPIERR_INVALID_UNIT_ID;
+        return BIOAPI_BSP_ERROR | BioAPIERR_FUNCTION_NOT_SUPPORTED;
     
-    uint64_t start_timestamp = Timestamp();
-    int32_t timeout_remaining = start_timestamp + Timeout - Timestamp();
+    uint64_t start_timestamp = BioUtil_Timestamp();
+    int32_t timeout_remaining = start_timestamp + Timeout - BioUtil_Timestamp();
     BioAPI_RETURN ret = BioAPI_OK;
     
     BioAPI_BIR_HANDLE capturedBirHandle  = BioAPI_INVALID_BIR_HANDLE;
@@ -645,7 +673,7 @@ BioAPI_RETURN AttachSession::Verify (
         &capturedBirHandle,
         timeout_remaining,
         AuditData );
-    timeout_remaining = start_timestamp + Timeout - Timestamp();
+    timeout_remaining = start_timestamp + Timeout - BioUtil_Timestamp();
     if (ret == BioAPI_OK && timeout_remaining <= 0)
         ret = BioAPIERR_TIMEOUT_EXPIRED;
     if (ret != BioAPI_OK) {
@@ -663,7 +691,7 @@ BioAPI_RETURN AttachSession::Verify (
         NULL,
         &processedBirHandle );
     FreeBIRHandle(capturedBirHandle);
-    timeout_remaining = start_timestamp + Timeout - Timestamp();
+    timeout_remaining = start_timestamp + Timeout - BioUtil_Timestamp();
     if (ret == BioAPI_OK && timeout_remaining <= 0)
         ret = BioAPIERR_TIMEOUT_EXPIRED;
     if (ret != BioAPI_OK) {
@@ -713,10 +741,10 @@ BioAPI_RETURN AttachSession::Identify (
     BioAPI_BIR_HANDLE *AuditData)
 {
     if (unitSensor==NULL || unitMatching==NULL || unitProcessing==NULL)
-        return BIOAPI_BSP_ERROR | BioAPIERR_INVALID_UNIT_ID;
+        return BIOAPI_BSP_ERROR | BioAPIERR_FUNCTION_NOT_SUPPORTED;
     
-    uint64_t start_timestamp = Timestamp();
-    int32_t timeout_remaining = start_timestamp + Timeout - Timestamp();
+    uint64_t start_timestamp = BioUtil_Timestamp();
+    int32_t timeout_remaining = start_timestamp + Timeout - BioUtil_Timestamp();
     BioAPI_RETURN ret = BioAPI_OK;
     
     BioAPI_BIR_HANDLE capturedBirHandle  = BioAPI_INVALID_BIR_HANDLE;
@@ -738,7 +766,7 @@ BioAPI_RETURN AttachSession::Identify (
         &capturedBirHandle,
         timeout_remaining,
         AuditData );
-    timeout_remaining = start_timestamp + Timeout - Timestamp();
+    timeout_remaining = start_timestamp + Timeout - BioUtil_Timestamp();
     if (ret == BioAPI_OK && timeout_remaining <= 0)
         ret = BioAPIERR_TIMEOUT_EXPIRED;
     if (ret != BioAPI_OK) {
@@ -756,7 +784,7 @@ BioAPI_RETURN AttachSession::Identify (
         NULL,
         &processedBirHandle );
     FreeBIRHandle(capturedBirHandle);
-    timeout_remaining = start_timestamp + Timeout - Timestamp();
+    timeout_remaining = start_timestamp + Timeout - BioUtil_Timestamp();
     if (ret == BioAPI_OK && timeout_remaining <= 0)
         ret = BioAPIERR_TIMEOUT_EXPIRED;
     if (ret != BioAPI_OK) {

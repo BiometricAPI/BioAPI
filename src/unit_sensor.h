@@ -1,6 +1,6 @@
 #pragma once
 
-#include "unit.h"
+#include "common.h"
 
 class UnitSensor : public Unit {
 public:

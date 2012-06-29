@@ -42,7 +42,7 @@ BioAPI_RETURN BioAPI BioSPI_BSPDetach (
     BioAPI_HANDLE BSPHandle);
 
 BioAPI_RETURN BioAPI BioSPI_QueryUnits (
-    const BioAPI_UUID *Uuid,
+    const BioAPI_UUID *BSPUuid,
     BioAPI_UNIT_SCHEMA **UnitSchemaArray,
     uint32_t *NumberOfElements);
 

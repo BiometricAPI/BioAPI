@@ -7,11 +7,6 @@
 #ifndef VR_BIOAPI_FUNCTIONS_H
 #define VR_BIOAPI_FUNCTIONS_H
 
-#include "bioapi_types.h"
-
-
-
-
 BioAPI_RETURN BioAPI BioAPI_Init(BioAPI_VERSION Version);
 
 BioAPI_RETURN BioAPI BioAPI_Terminate(void);
@@ -290,9 +285,5 @@ BioAPI_RETURN BioAPI BioAPI_Util_InstallBFP (
     BioAPI_INSTALL_ACTION Action,
     BioAPI_INSTALL_ERROR *Error,
     const BioAPI_BFP_SCHEMA *BFPSchema);
-
-
-
-
 
 #endif //VR_BIOAPI_FUNCTIONS_H

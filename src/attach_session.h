@@ -1,10 +1,6 @@
 #pragma once
 
-#include "unit_archive.h"
-#include "unit_matching.h"
-#include "unit_processing.h"
-#include "unit_sensor.h"
-#include "handle_manager.h"
+#include "common.h"
 
 class AttachSession : public Cancellable {
 public:
@@ -15,16 +11,16 @@ public:
     HandleManager<BioAPI_BIR_HANDLE, BioAPI_BIR> bir_handles;
     
 public:
-    AttachSession(
+    AttachSession (
         UnitArchive *unitArchive,
         UnitMatching *unitMatching,
         UnitProcessing *unitProcessing,
         UnitSensor *unitSensor);
-    ~AttachSession();
     
-    ///Subclass implementation begins to tell tasks to terminate as soon as possible. Must be followed by \ref CancelTasksJoin.
+    ~AttachSession ();
+    
+    //Invokes Cancel() on each child unit
     virtual void CancelTasksAsync();
-    ///Subclass implementation waits running tasks to terminated. Must be preceeded by \ref CancelTasksAsync().
     virtual void CancelTasksJoin();
 
     

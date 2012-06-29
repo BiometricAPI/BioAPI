@@ -16,8 +16,12 @@
  * -# Component Registry Interface
  * -# \ref bioapi_errors.h "Error Codes and Error Values"
  */
-#ifndef VR_BIOAPI_H
-#define VR_BIOAPI_H
+#ifndef BIOAPI_H
+#define BIOAPI_H
+
+ #ifdef __cplusplus
+ extern "C" {
+ #endif 
 
 #include "bioapi_scope.h"              ///Section  1: "Scope"
 #include "bioapi_conformance.h"        ///Section  2: "Conformance"
@@ -30,5 +34,9 @@
 #include "bioapi_spi.h"                ///Section  9: "BioAPI Service Provider Interface"
 #include "bioapi_componentregistry.h"  ///Section 10: "Component registry interface"
 #include "bioapi_errors.h"             ///Section 11: "BioAPI error handling"
+
+#ifdef __cplusplus
+ } //extern "C"
+ #endif 
 
 #endif //VR_BIOAPI_H

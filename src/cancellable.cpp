@@ -1,5 +1,4 @@
-#include "cancellable.h"
-#include <ctime>
+#include "common.h"
 
 Cancellable::Cancellable() {
     pthread_mutex_init(&cancellable_mutex, NULL);
@@ -84,10 +83,3 @@ void Cancellable::CancelTasksJoin() {
   //User implementations to wait until operations started by CancelTasksAsync are over.
 }
 
-
-uint64_t Cancellable::Timestamp() {
-  struct timespec now;
-  clock_gettime(CLOCK_MONOTONIC, &now);
-  
-  return now.tv_sec*(uint64_t)1000 + now.tv_nsec/(uint64_t)1000000;
-}
